@@ -1,0 +1,476 @@
+{{ uid = request.params.uid }}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Активация промокода</title>
+    <link
+      rel="stylesheet"
+      href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css"
+    />
+    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Roboto", sans-serif;
+        background-color: #fff;
+      }
+
+      h1 {
+        text-align: center;
+        font-size: 2rem;
+      }
+
+      p {
+        text-align: center;
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 35px 0px 65px 0px;
+        background-color: #65a4eb;
+      }
+
+      .stars:first-child {
+        transform: translateY(70px) rotate(180deg);
+        animation: animation-stars-left 1s;
+      }
+
+      .stars:last-child {
+        transform: translateY(-70px);
+        animation: animation-stars-right 1s;
+      }
+
+      .present {
+        animation: animation-present 1s ease-in-out;
+      }
+
+      main {
+        padding: 0px 15px 15px;
+      }
+
+      .promo {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        margin-bottom: 2rem;
+      }
+
+      .promo::after {
+        content: "";
+        position: absolute;
+        left: -15px;
+        right: -15px;
+        top: -30px;
+        height: 30px;
+        background-color: #fff;
+        border-top-left-radius: 50% 36px;
+        border-top-right-radius: 50% 36px;
+      }
+
+      .send {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 55px;
+      }
+
+      .input,
+      .button {
+        max-width: 250px;
+        width: 100%;
+        padding: 10px 15px;
+        border-radius: 3px;
+        box-shadow: 0px 0px 2px 0px #00000038;
+        transition: all 0.4s ease-in-out;
+      }
+
+      .input {
+        text-align: center;
+        border: 1px solid #e0e0e0;
+      }
+
+      .input:focus-visible {
+        outline-color: #65a4eb;
+      }
+
+      .input::placeholder {
+        text-align: center;
+        color: #d7d7d7;
+      }
+
+      .button {
+        font-size: 14px;
+        border: none;
+        color: #fff;
+        background-color: #65a4eb;
+      }
+
+      .button:active {
+        background-color: #3b89e3;
+      }
+
+      .button:disabled {
+        background-color: #a8c0dc;
+      }
+
+      .result {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #fff;
+        max-width: 200px;
+        min-height: 1px;
+        transition: all 0.4s ease-in-out;
+      }
+
+      .error {
+        color: #dc5555;
+      }
+
+      .error-input {
+        border: 1px solid #dc5555;
+      }
+
+      .success {
+        color: #10de99;
+      }
+
+      @keyframes animation-stars-left {
+        0% {
+          transform: scale(0.5);
+        }
+        100% {
+          transform: scale(1), translateY(70px) rotate(180deg);
+        }
+      }
+      @keyframes animation-stars-right {
+        0% {
+          transform: scale(0.5) rotate(180deg);
+        }
+        100% {
+          transform: scale(1) translateY(-70px) rotate(0deg);
+        }
+      }
+      @keyframes animation-present {
+        0% {
+          transform: scale(0.8);
+        }
+        95% {
+          transform: scale(1.01);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="stars">
+        <svg
+          width="41"
+          height="32"
+          viewBox="0 0 41 32"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M11.6157 20.1194C11.4105 20.5016 10.8529 20.4648 10.6654 20.0559L8.66166 15.6917L3.85588 14.9309C3.40675 14.8594 3.22142 14.2899 3.54915 13.9883L7.18482 10.6332L6.52431 5.83152C6.4649 5.39865 6.90356 5.09588 7.28723 5.30494L11.5426 7.62543L15.969 5.41595C16.3671 5.21646 16.8339 5.59173 16.7407 6.0376L15.7485 10.8002L19.1184 14.2215C19.4343 14.5418 19.2709 15.0762 18.8408 15.1325L13.9455 15.7701L11.6157 20.1194Z"
+            fill="white"
+          />
+          <path
+            d="M32.6468 29.9168C32.4984 30.1932 32.0951 30.1666 31.9596 29.8709L30.5103 26.7143L27.0344 26.1641C26.7096 26.1124 26.5755 25.7004 26.8125 25.4823L29.4421 23.0557L28.9644 19.5827C28.9214 19.2697 29.2387 19.0507 29.5162 19.2019L32.594 20.8802L35.7955 19.2822C36.0834 19.1379 36.4211 19.4093 36.3536 19.7318L35.636 23.1765L38.0734 25.651C38.3018 25.8827 38.1837 26.2692 37.8725 26.3099L34.3319 26.7711L32.6468 29.9168Z"
+            fill="white"
+            fill-opacity="0.34"
+          />
+        </svg>
+      </div>
+      <div class="present">
+        <svg
+          width="168"
+          height="117"
+          viewBox="0 0 168 117"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <g filter="url(#filter0_d_2_37)">
+            <rect x="24" y="33" width="120" height="79" rx="15" fill="white" />
+          </g>
+          <g filter="url(#filter1_d_2_37)">
+            <rect x="14" y="24" width="140" height="79" rx="15" fill="white" />
+          </g>
+          <rect x="126" y="24" width="20" height="70" fill="#65A4EB" />
+          <g filter="url(#filter2_d_2_37)">
+            <path
+              fill-rule="evenodd"
+              clip-rule="evenodd"
+              d="M136 5.99998C137.657 5.99998 139 4.65684 139 2.99998H149C157.284 2.99998 164 9.71571 164 18V79C164 87.2843 157.284 94 149 94H138.829C138.94 93.6872 139 93.3506 139 93C139 91.3431 137.657 90 136 90C134.343 90 133 91.3431 133 93C133 93.3506 133.06 93.6872 133.171 94H19C10.7157 94 4 87.2843 4 79V18C4 9.71571 10.7157 2.99998 19 2.99998H133C133 4.65684 134.343 5.99998 136 5.99998ZM139 39C139 40.6568 137.657 42 136 42C134.343 42 133 40.6568 133 39C133 37.3431 134.343 36 136 36C137.657 36 139 37.3431 139 39ZM136 24C137.657 24 139 22.6568 139 21C139 19.3431 137.657 18 136 18C134.343 18 133 19.3431 133 21C133 22.6568 134.343 24 136 24ZM139 57C139 58.6568 137.657 60 136 60C134.343 60 133 58.6568 133 57C133 55.3431 134.343 54 136 54C137.657 54 139 55.3431 139 57ZM136 15C137.657 15 139 13.6568 139 12C139 10.3431 137.657 8.99998 136 8.99998C134.343 8.99998 133 10.3431 133 12C133 13.6568 134.343 15 136 15ZM139 48C139 49.6568 137.657 51 136 51C134.343 51 133 49.6568 133 48C133 46.3431 134.343 45 136 45C137.657 45 139 46.3431 139 48ZM136 33C137.657 33 139 31.6568 139 30C139 28.3431 137.657 27 136 27C134.343 27 133 28.3431 133 30C133 31.6568 134.343 33 136 33ZM139 66C139 67.6568 137.657 69 136 69C134.343 69 133 67.6568 133 66C133 64.3431 134.343 63 136 63C137.657 63 139 64.3431 139 66ZM136 78C137.657 78 139 76.6568 139 75C139 73.3431 137.657 72 136 72C134.343 72 133 73.3431 133 75C133 76.6568 134.343 78 136 78ZM139 84C139 85.6568 137.657 87 136 87C134.343 87 133 85.6568 133 84C133 82.3431 134.343 81 136 81C137.657 81 139 82.3431 139 84Z"
+              fill="white"
+            />
+          </g>
+          <path
+            d="M50.6 31.5833C50.6 29.5721 51.4429 27.6432 52.9431 26.2211C54.4434 24.7989 56.4783 24 58.6 24C60.7217 24 62.7566 24.7989 64.2569 26.2211C65.7571 27.6432 66.6 29.5721 66.6 31.5833C66.6 29.5721 67.4429 27.6432 68.9431 26.2211C70.4434 24.7989 72.4783 24 74.6 24C76.7217 24 78.7566 24.7989 80.2569 26.2211C81.7571 27.6432 82.6 29.5721 82.6 31.5833V31.6015C82.6 31.8139 82.6 32.4205 82.4784 33.1H89C89.8487 33.1 90.6626 33.4196 91.2627 33.9884C91.8629 34.5573 92.2 35.3288 92.2 36.1333V42.2C92.2 43.0045 91.8629 43.776 91.2627 44.3449C90.6626 44.9137 89.8487 45.2333 89 45.2333V67.9833C89 69.1901 88.4943 70.3474 87.5941 71.2007C86.6939 72.0539 85.473 72.5333 84.2 72.5333H49C47.727 72.5333 46.5061 72.0539 45.6059 71.2007C44.7057 70.3474 44.2 69.1901 44.2 67.9833V45.2333C43.3513 45.2333 42.5374 44.9137 41.9373 44.3449C41.3371 43.776 41 43.0045 41 42.2V36.1333C41 35.3288 41.3371 34.5573 41.9373 33.9884C42.5374 33.4196 43.3513 33.1 44.2 33.1H50.7216C50.6375 32.6045 50.5969 32.1033 50.6 31.6015V31.5833ZM54.0176 33.1H63.4V31.5833C63.4 30.9858 63.2758 30.3941 63.0346 29.8421C62.7934 29.2901 62.4398 28.7885 61.9941 28.366C61.5484 27.9435 61.0192 27.6083 60.4369 27.3797C59.8545 27.151 59.2303 27.0333 58.6 27.0333C57.9697 27.0333 57.3455 27.151 56.7631 27.3797C56.1808 27.6083 55.6516 27.9435 55.2059 28.366C54.7602 28.7885 54.4066 29.2901 54.1654 29.8421C53.9242 30.3941 53.8 30.9858 53.8 31.5833C53.8 31.8412 53.8064 32.4145 53.944 32.8877L54.0176 33.1ZM69.8 33.1H79.1824L79.256 32.8877C79.3936 32.4145 79.4 31.8412 79.4 31.5833C79.4 30.3766 78.8943 29.2193 77.9941 28.366C77.0939 27.5127 75.873 27.0333 74.6 27.0333C73.327 27.0333 72.1061 27.5127 71.2059 28.366C70.3057 29.2193 69.8 30.3766 69.8 31.5833V33.1ZM44.2 36.1333V42.2H63.4V36.1333H44.2ZM69.8 36.1333V42.2H89V36.1333H69.8ZM85.8 45.2333H69.8V69.5H84.2C84.6243 69.5 85.0313 69.3402 85.3314 69.0558C85.6314 68.7713 85.8 68.3856 85.8 67.9833V45.2333ZM63.4 69.5V45.2333H47.4V67.9833C47.4 68.3856 47.5686 68.7713 47.8686 69.0558C48.1687 69.3402 48.5757 69.5 49 69.5H63.4Z"
+            fill="#65A3EC"
+          />
+          <defs>
+            <filter
+              id="filter0_d_2_37"
+              x="20"
+              y="30"
+              width="128"
+              height="87"
+              filterUnits="userSpaceOnUse"
+              color-interpolation-filters="sRGB"
+            >
+              <feFlood flood-opacity="0" result="BackgroundImageFix" />
+              <feColorMatrix
+                in="SourceAlpha"
+                type="matrix"
+                values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+                result="hardAlpha"
+              />
+              <feOffset dy="1" />
+              <feGaussianBlur stdDeviation="2" />
+              <feComposite in2="hardAlpha" operator="out" />
+              <feColorMatrix
+                type="matrix"
+                values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.1 0"
+              />
+              <feBlend
+                mode="normal"
+                in2="BackgroundImageFix"
+                result="effect1_dropShadow_2_37"
+              />
+              <feBlend
+                mode="normal"
+                in="SourceGraphic"
+                in2="effect1_dropShadow_2_37"
+                result="shape"
+              />
+            </filter>
+            <filter
+              id="filter1_d_2_37"
+              x="10"
+              y="21"
+              width="148"
+              height="87"
+              filterUnits="userSpaceOnUse"
+              color-interpolation-filters="sRGB"
+            >
+              <feFlood flood-opacity="0" result="BackgroundImageFix" />
+              <feColorMatrix
+                in="SourceAlpha"
+                type="matrix"
+                values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+                result="hardAlpha"
+              />
+              <feOffset dy="1" />
+              <feGaussianBlur stdDeviation="2" />
+              <feComposite in2="hardAlpha" operator="out" />
+              <feColorMatrix
+                type="matrix"
+                values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.1 0"
+              />
+              <feBlend
+                mode="normal"
+                in2="BackgroundImageFix"
+                result="effect1_dropShadow_2_37"
+              />
+              <feBlend
+                mode="normal"
+                in="SourceGraphic"
+                in2="effect1_dropShadow_2_37"
+                result="shape"
+              />
+            </filter>
+            <filter
+              id="filter2_d_2_37"
+              x="0"
+              y="-1.52588e-05"
+              width="168"
+              height="99"
+              filterUnits="userSpaceOnUse"
+              color-interpolation-filters="sRGB"
+            >
+              <feFlood flood-opacity="0" result="BackgroundImageFix" />
+              <feColorMatrix
+                in="SourceAlpha"
+                type="matrix"
+                values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+                result="hardAlpha"
+              />
+              <feOffset dy="1" />
+              <feGaussianBlur stdDeviation="2" />
+              <feComposite in2="hardAlpha" operator="out" />
+              <feColorMatrix
+                type="matrix"
+                values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.1 0"
+              />
+              <feBlend
+                mode="normal"
+                in2="BackgroundImageFix"
+                result="effect1_dropShadow_2_37"
+              />
+              <feBlend
+                mode="normal"
+                in="SourceGraphic"
+                in2="effect1_dropShadow_2_37"
+                result="shape"
+              />
+            </filter>
+          </defs>
+        </svg>
+      </div>
+      <div class="stars">
+        <svg
+          width="41"
+          height="32"
+          viewBox="0 0 41 32"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M11.6157 20.1194C11.4105 20.5016 10.8529 20.4648 10.6654 20.0559L8.66166 15.6917L3.85588 14.9309C3.40675 14.8594 3.22142 14.2899 3.54915 13.9883L7.18482 10.6332L6.52431 5.83152C6.4649 5.39865 6.90356 5.09588 7.28723 5.30494L11.5426 7.62543L15.969 5.41595C16.3671 5.21646 16.8339 5.59173 16.7407 6.0376L15.7485 10.8002L19.1184 14.2215C19.4343 14.5418 19.2709 15.0762 18.8408 15.1325L13.9455 15.7701L11.6157 20.1194Z"
+            fill="white"
+          />
+          <path
+            d="M32.6468 29.9168C32.4984 30.1932 32.0951 30.1666 31.9596 29.8709L30.5103 26.7143L27.0344 26.1641C26.7096 26.1124 26.5755 25.7004 26.8125 25.4823L29.4421 23.0557L28.9644 19.5827C28.9214 19.2697 29.2387 19.0507 29.5162 19.2019L32.594 20.8802L35.7955 19.2822C36.0834 19.1379 36.4211 19.4093 36.3536 19.7318L35.636 23.1765L38.0734 25.651C38.3018 25.8827 38.1837 26.2692 37.8725 26.3099L34.3319 26.7711L32.6468 29.9168Z"
+            fill="white"
+            fill-opacity="0.34"
+          />
+        </svg>
+      </div>
+    </header>
+    <main>
+      <section class="promo">
+        <h1 class="title">Активация купона</h1>
+        <p class="description">
+          Введите промокод и получите годовую подписку или пополните баланс на
+          сумму, равную стоимости годовой подписки!
+        </p>
+      </section>
+      <div class="send">
+        <input
+          class="input"
+          placeholder="XXXX-XXXX-XXXX"
+          type="text"
+          id="promo-input"
+          maxlength="14"
+          required
+        />
+        <div class="result" id="result"></div>
+        <button disabled class="button" id="button">Отправить</button>
+      </div>
+    </main>
+    <script>
+      // Открыть на весь экран
+      Telegram.WebApp.expand();
+
+      // Элементы из DOM
+      const promoInput = document.getElementById("promo-input");
+      const buttonSend = document.getElementById("button");
+      const result = document.getElementById("result");
+
+      // Слушатели событий
+      promoInput.addEventListener("input", (e) => checkPromocode(e));
+      buttonSend.addEventListener("pointerdown", sendPromocode);
+      promoInput.addEventListener("focus", scrollViewInput);
+
+      // Функции
+      // Сентрирование инпута при открытой клавиатуре
+      function scrollViewInput() {
+        const timer = setTimeout(() => {
+          console.log("asd");
+
+          promoInput.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+          });
+          return clearTimeout(timer);
+        }, 300);
+      }
+
+      // Проверка содержимого инпута
+      function checkPromocode(e) {
+        // Убираем всё, кроме букв и цифр
+        let value = e.target.value.replace(/[^a-zA-Z0-9]/g, "");
+
+        // Разбиваем на группы по 4 символа и присоединяем дефисы
+        if (value.length > 4) {
+          value = value.match(/.{1,4}/g).join("-");
+        }
+
+        // Преобразуем в верхний регистр
+        e.target.value = value.toUpperCase();
+
+        if (value.length >= 7) {
+          buttonSend.disabled = false;
+        } else buttonSend.disabled = true;
+      }
+
+      // Функция отправки GET-запроса
+      function sendPromocode() {
+        const promocode = promoInput.value;
+
+        // Обнуление
+        promoInput.classList.remove("error-input");
+        result.classList.remove("error");
+        result.textContent = "";
+
+        if (buttonSend.disabled) {
+          result.textContent = "Купон должен содеражать не меньше 6 символов!";
+          result.classList.add("error");
+          promoInput.classList.add("error-input");
+          return;
+        }
+
+        // Выполнение GET-запроса
+        fetch(
+          `https://shmadmin.snegirev.top/shm/v1/public/api_promo_apply?uid={{ uid | html }}&format=json&promocode=${promocode}`
+        )
+          .then((response) => {
+            // Проверка, что запрос завершился успешно
+            if (!response.ok) {
+              throw new Error("Ошибка сети: " + response.status);
+            }
+
+            // Парсинг JSON-ответа
+            return response.json().catch(() => {
+              throw new Error("Некорректный JSON-ответ");
+            });
+          })
+          .then((data) => {
+            // Сбрасываем класс ошибки при успешном ответе
+            result.classList.remove("error");
+
+            // Проверка на наличие ошибки в самом содержимом ответа
+            if (data.status === "error") {
+              throw new Error(data.message);
+            }
+
+            // Если ошибки нет, выводим успешный результат
+            result.textContent = `${data.message}`;
+            result.classList.add("success");
+          })
+          .catch((error) => {
+            // Применение стиля ошибки
+            result.textContent = `Ошибка: ${error.message}`;
+            result.classList.add("error");
+          });
+      }
+    </script>
+  </body>
+</html>
