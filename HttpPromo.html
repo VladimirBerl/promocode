@@ -130,6 +130,7 @@
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
+        text-align: center;
         color: #fff;
         max-width: 200px;
         min-height: 1px;
@@ -365,10 +366,10 @@
       <div class="send">
         <input
           class="input"
-          placeholder="XXXX-XXXX-XXXX"
+          placeholder="XXXX-XXXXXX"
           type="text"
           id="promo-input"
-          maxlength="14"
+          maxlength="11"
           required
         />
         <div class="result" id="result"></div>
@@ -386,15 +387,13 @@
 
       // Слушатели событий
       promoInput.addEventListener("input", (e) => checkPromocode(e));
+      promoInput.addEventListener("pointerdown", scrollViewInput);
       buttonSend.addEventListener("pointerdown", sendPromocode);
-      promoInput.addEventListener("focus", scrollViewInput);
 
       // Функции
       // Сентрирование инпута при открытой клавиатуре
       function scrollViewInput() {
         const timer = setTimeout(() => {
-          console.log("asd");
-
           promoInput.scrollIntoView({
             behavior: "smooth",
             block: "center",
@@ -408,17 +407,20 @@
         // Убираем всё, кроме букв и цифр
         let value = e.target.value.replace(/[^a-zA-Z0-9]/g, "");
 
-        // Разбиваем на группы по 4 символа и присоединяем дефисы
+        // Если длина больше 4, вставляем дефис после 4 символов
         if (value.length > 4) {
-          value = value.match(/.{1,4}/g).join("-");
+          value = value.slice(0, 4) + "-" + value.slice(4);
         }
 
         // Преобразуем в верхний регистр
         e.target.value = value.toUpperCase();
 
-        if (value.length >= 7) {
+        // Если длина соответствует формату XXXX-XXXXXX (11 символов с дефисом)
+        if (value.length === 11) {
           buttonSend.disabled = false;
-        } else buttonSend.disabled = true;
+        } else {
+          buttonSend.disabled = true;
+        }
       }
 
       // Функция отправки GET-запроса
@@ -431,7 +433,7 @@
         result.textContent = "";
 
         if (buttonSend.disabled) {
-          result.textContent = "Купон должен содеражать не меньше 6 символов!";
+          result.textContent = "Купон должен содеражать 10 символов!";
           result.classList.add("error");
           promoInput.classList.add("error-input");
           return;
